@@ -2,11 +2,11 @@ import { Routes, Route } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { Navbar } from '@/components/Navbar'
 import { GameEditDialog } from '@/components/GameEditDialog'
-import Home from '@/pages/Home'
-import Backlog from '@/pages/Backlog'
-import Top100 from '@/pages/Top100'
-import Perfil from '@/pages/Perfil'
-import Dev from '@/pages/Dev'
+import Home from '@/components/Home'
+import Backlog from '@/components/Backlog'
+import Top100 from '@/components/Top100'
+import Perfil from '@/components/Perfil'
+import Dev from '@/components/Dev'
 
 /**
  * Layout raíz: Navbar fija (Fase 6, reemplaza la nav temporal de la Fase 5),
