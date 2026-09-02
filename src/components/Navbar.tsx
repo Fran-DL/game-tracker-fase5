@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { Gamepad2, Search, User, House, ListChecks, Trophy, UserCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { useLibraryStore, useProfileStore } from '@/store'
@@ -33,10 +33,10 @@ const ENLACES_PERFIL = [
  * de edición global, igual que en Backlog/Top100.
  */
 export function Navbar() {
+  const navigate = useNavigate()
   const contenedorRef = useRef<HTMLDivElement>(null)
 
   const existeJuego = useLibraryStore((state) => state.existeJuego)
-  const agregarJuego = useLibraryStore((state) => state.agregarJuego)
   const fotoBase64 = useProfileStore((state) => state.fotoBase64)
   const nombreUsuario = useProfileStore((state) => state.nombreUsuario)
 
@@ -95,13 +95,9 @@ export function Navbar() {
   }, [terminoDebounced])
 
   function manejarSeleccion(juego: ResultadoBusquedaJuego) {
-    if (!existeJuego(juego.id)) {
-      agregarJuego(juego)
-      toast.success(`"${juego.titulo}" se agregó a tu Backlog.`)
-    }
-    abrirEdicionJuego(juego.id)
     setDropdownAbierto(false)
     setTermino('')
+    navigate(`/juego/${juego.id}`)
   }
 
   const mostrarDropdown = dropdownAbierto && termino.trim().length > 0

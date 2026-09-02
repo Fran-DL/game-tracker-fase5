@@ -1,6 +1,6 @@
-import type { CacheTop100, ResultadoBusquedaJuego } from '@/types'
+import type { CacheTop100, DetalleJuegoCompleto, ResultadoBusquedaJuego } from '@/types'
 import { igdbFetch } from './igdbClient'
-import { mapearJuegoIGDB } from './igdbMappers'
+import { mapearJuegoIGDB, mapearDetalleJuegoIGDB } from './igdbMappers'
 
 const CLAVE_CACHE_TOP_100 = 'game-tracker-top100-cache'
 const DURACION_CACHE_MS = 24 * 60 * 60 * 1000 // 24 horas
@@ -100,4 +100,28 @@ export async function obtenerTop100(opciones?: {
   const juegos = crudos.map(mapearJuegoIGDB)
   guardarCacheTop100(juegos)
   return juegos
+}
+
+
+/** Campos que se piden a IGDB para la vista de detalle (`/juego/:id`). */
+const CAMPOS_DETALLE_JUEGO =
+  'id,name,summary,cover.image_id,first_release_date,genres.name,platforms.name,screenshots.image_id,videos.video_id'
+
+/**
+ * Obtiene el detalle completo de un juego (resumen, plataformas, capturas
+ * y video) para la vista `/juego/:id`. A diferencia de `obtenerDetalleJuego`,
+ * trae todo lo necesario para la galería en una sola petición.
+ */
+export async function obtenerDetalleCompletoJuego(id: number): Promise<DetalleJuegoCompleto> {
+  const query = `
+    fields ${CAMPOS_DETALLE_JUEGO};
+    where id = ${id};
+  `
+
+  const crudos = await igdbFetch('/games', query)
+  const [crudo] = crudos
+  if (!crudo) {
+    throw new Error(`No se encontró información en IGDB para el juego con id ${id}.`)
+  }
+  return mapearDetalleJuegoIGDB(crudo)
 }

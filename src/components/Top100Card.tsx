@@ -1,9 +1,9 @@
+import { useNavigate } from 'react-router-dom'
 import type { MouseEvent } from 'react'
 import { Plus, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import type { ResultadoBusquedaJuego } from '@/types'
 import { useLibraryStore } from '@/store'
-import { abrirEdicionJuego } from '@/store/useGameEditDialogStore'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,16 +13,14 @@ interface Top100CardProps {
 }
 
 /**
- * Tarjeta de juego usada en el grid del Top 100 (Fase 7).
+ * Tarjeta de juego usada en el grid del Top 100.
  *
- * Si el juego ya está en la biblioteca: muestra el badge "Ya añadido",
- * deshabilita el botón de agregar y permite abrir el modal de edición
- * clickeando la tarjeta (mismo patrón que Backlog/Home).
- *
- * Si todavía no está: solo se puede agregar (clickear la tarjeta no hace
- * nada, para no agregarlo "sin querer" antes de decidirlo con el botón).
+ * Clickear la tarjeta navega siempre a `/juego/:id` (esté o no en la
+ * biblioteca); el botón "Añadir" agrega directo al backlog sin navegar,
+ * cortando la propagación del click.
  */
 export function Top100Card({ juego }: Top100CardProps) {
+  const navigate = useNavigate()
   const existeJuego = useLibraryStore((state) => state.existeJuego)
   const agregarJuego = useLibraryStore((state) => state.agregarJuego)
   const yaAñadido = existeJuego(juego.id)
@@ -35,21 +33,18 @@ export function Top100Card({ juego }: Top100CardProps) {
   }
 
   function manejarClickTarjeta() {
-    if (yaAñadido) abrirEdicionJuego(juego.id)
+    navigate(`/juego/${juego.id}`)
   }
 
   return (
     <article
-      role={yaAñadido ? 'button' : undefined}
-      tabIndex={yaAñadido ? 0 : undefined}
+      role="button"
+      tabIndex={0}
       onClick={manejarClickTarjeta}
       onKeyDown={(e) => {
-        if (yaAñadido && (e.key === 'Enter' || e.key === ' ')) abrirEdicionJuego(juego.id)
+        if (e.key === 'Enter' || e.key === ' ') manejarClickTarjeta()
       }}
-      className={cn(
-        'group relative flex flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-all hover:shadow-md',
-        yaAñadido && 'cursor-pointer hover:scale-[1.02]'
-      )}
+      className="group relative flex cursor-pointer flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-all hover:scale-[1.02] hover:shadow-md"
     >
       {yaAñadido && (
         <Badge variant="secondary" className="absolute left-2 top-2 z-10 shadow">

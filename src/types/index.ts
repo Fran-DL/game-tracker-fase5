@@ -78,6 +78,9 @@ export interface IGDBJuegoCrudo {
   }
   first_release_date?: number
   genres?: { id: number; name: string }[]
+  platforms?: { id: number; name: string }[]
+  screenshots?: { id: number; image_id: string }[]
+  videos?: { id: number; video_id: string; name?: string }[]
   total_rating?: number
   total_rating_count?: number
   rating?: number
@@ -109,4 +112,31 @@ export interface TokenTwitch {
 export interface CacheTop100 {
   juegos: ResultadoBusquedaJuego[]
   timestamp: number
+}
+
+/**
+ * Captura de pantalla de un juego, en dos tamaños: miniatura (para la
+ * galería horizontal) y grande (para el lightbox al hacer click).
+ */
+export interface CapturaJuego {
+  urlMiniatura: string
+  urlGrande: string
+}
+
+/**
+ * Detalle completo de un juego obtenido de IGDB para la vista `/juego/:id`.
+ * A diferencia de `ResultadoBusquedaJuego`, incluye resumen, plataformas
+ * y medios (video + capturas) para la galería.
+ */
+export interface DetalleJuegoCompleto {
+  id: number
+  titulo: string
+  caratula: string
+  año: number | null
+  generos: string[]
+  plataformas: string[]
+  resumen: string
+  capturas: CapturaJuego[]
+  /** id de YouTube del primer video encontrado, o null si no hay. */
+  idVideo: string | null
 }
