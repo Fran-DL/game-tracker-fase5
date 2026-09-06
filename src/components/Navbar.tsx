@@ -19,9 +19,8 @@ import {
 
 const ENLACES_PERFIL = [
   { to: '/', etiqueta: 'Home', icono: House, fin: true },
-  { to: '/backlog', etiqueta: 'Backlog', icono: ListChecks, fin: false },
-  { to: '/top100', etiqueta: 'Top 100', icono: Trophy, fin: false },
   { to: '/perfil', etiqueta: 'Perfil', icono: UserCircle, fin: false },
+  { to: '/backlog', etiqueta: 'Backlog', icono: ListChecks, fin: false },
 ] as const
 
 /**
@@ -108,7 +107,7 @@ export function Navbar() {
         {/* Izquierda: logo */}
         <Link to="/" className="flex shrink-0 items-center gap-2 font-semibold tracking-tight">
           <Gamepad2 className="h-6 w-6 text-primary" />
-          <span className="hidden sm:inline">Game Tracker</span>
+          <span className="hidden sm:inline">Vault - Game Tracker</span>
         </Link>
 
         {/* Centro: buscador global */}
@@ -138,7 +137,23 @@ export function Navbar() {
           />
         </div>
 
-        {/* Derecha: avatar de perfil */}
+        {/* Derecha: acceso al Top 100 y avatar de perfil */}
+        <NavLink
+          to="/top100"
+          aria-label="Top 100"
+          title="Top 100"
+          className={({ isActive }) =>
+            `flex h-10 shrink-0 items-center justify-center gap-2 rounded-md border px-3 text-sm font-medium transition-colors ${
+              isActive
+                ? 'border-primary/50 bg-primary/15 text-primary'
+                : 'border-border bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground'
+            }`
+          }
+        >
+          <Trophy className="h-5 w-5" />
+          <span>Top 100</span>
+        </NavLink>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
