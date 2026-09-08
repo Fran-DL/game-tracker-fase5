@@ -1,6 +1,6 @@
-import { useRef, useState, type ChangeEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { toast } from 'sonner'
-import { Camera, X, Star, UserCircle } from 'lucide-react'
+import { Camera, X, Star, UserCircle, Trophy, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useLibraryStore, useProfileStore } from '@/store'
 import { abrirEdicionJuego } from '@/store/useGameEditDialogStore'
 import { convertirArchivoABase64 } from '@/lib/imagen'
@@ -11,12 +11,16 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 
+
 /** Margen razonable para no llenar la cuota de localStorage con la foto en Base64. */
 const LIMITE_TAMAÑO_FOTO_BYTES = 3 * 1024 * 1024
+
+const JUEGOS_LOGROS_POR_PAGINA = 15
 
 export default function Perfil() {
   const inputArchivoRef = useRef<HTMLInputElement>(null)
   const [gestorFavoritosAbierto, setGestorFavoritosAbierto] = useState(false)
+  const [paginaLogros, setPaginaLogros] = useState(0)
 
   const nombreUsuario = useProfileStore((state) => state.nombreUsuario)
   const biografia = useProfileStore((state) => state.biografia)
@@ -28,6 +32,20 @@ export default function Perfil() {
   const juegos = useLibraryStore((state) => state.juegos)
   const toggleFavorito = useLibraryStore((state) => state.toggleFavorito)
   const favoritos = juegos.filter((juego) => juego.esFavorito).slice(0, 10)
+  const juegosConLogros = juegos.filter((juego) => juego.logrosCompletos)
+  const totalPaginasLogros = Math.max(1, Math.ceil(juegosConLogros.length / JUEGOS_LOGROS_POR_PAGINA))
+  const juegosLogrosPagina = juegosConLogros.slice(
+    paginaLogros * JUEGOS_LOGROS_POR_PAGINA,
+    (paginaLogros + 1) * JUEGOS_LOGROS_POR_PAGINA
+  )
+
+  // Si se elimina un juego y la página actual queda vacía (ej. estabas en la
+  // última página), retrocede automáticamente en vez de mostrar un grid vacío.
+  useEffect(() => {
+    if (paginaLogros > 0 && paginaLogros >= totalPaginasLogros) {
+      setPaginaLogros(totalPaginasLogros - 1)
+    }
+  }, [paginaLogros, totalPaginasLogros])
 
   async function manejarSeleccionArchivo(evento: ChangeEvent<HTMLInputElement>) {
     const archivo = evento.target.files?.[0]
@@ -151,6 +169,76 @@ export default function Perfil() {
               </div>
             ))}
           </div>
+        )}
+      </section>
+
+      {/* Logros completos */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-medium">Logros completos</h2>
+          {juegosConLogros.length > 0 && (
+            <span className="text-sm text-muted-foreground">{juegosConLogros.length} juegos</span>
+          )}
+        </div>
+
+        {juegosConLogros.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
+            Todavía no marcaste ningún juego con los logros completos.
+          </p>
+        ) : (
+          <>
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
+              {juegosLogrosPagina.map((juego) => (
+                <div
+                  key={juego.id}
+                  className="group relative cursor-pointer overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-transform hover:scale-[1.02]"
+                  onClick={() => abrirEdicionJuego(juego.id)}
+                >
+                  {juego.caratula ? (
+                    <img
+                      src={juego.caratula}
+                      alt={`Carátula de ${juego.titulo}`}
+                      className="aspect-[3/4] w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex aspect-[3/4] w-full flex-col items-center justify-center gap-1 bg-secondary p-2 text-center text-xs text-muted-foreground">
+                      <Trophy className="h-4 w-4" />
+                      {juego.titulo}
+                    </div>
+                  )}
+                  <span className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-amber-400">
+                    <Trophy className="h-3.5 w-3.5" />
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {totalPaginasLogros > 1 && (
+              <div className="flex items-center justify-center gap-3 pt-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setPaginaLogros((p) => Math.max(0, p - 1))}
+                  disabled={paginaLogros === 0}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  Página {paginaLogros + 1} de {totalPaginasLogros}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setPaginaLogros((p) => Math.min(totalPaginasLogros - 1, p + 1))}
+                  disabled={paginaLogros === totalPaginasLogros - 1}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </section>
 

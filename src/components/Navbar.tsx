@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Gamepad2, Search, User, House, ListChecks, Trophy, UserCircle } from 'lucide-react'
+import { Search, User, House, ListChecks, Trophy, UserCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { useLibraryStore, useProfileStore } from '@/store'
 import { abrirEdicionJuego } from '@/store/useGameEditDialogStore'
@@ -106,7 +106,11 @@ export function Navbar() {
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3 sm:px-6">
         {/* Izquierda: logo */}
         <Link to="/" className="flex shrink-0 items-center gap-2 font-semibold tracking-tight">
-          <Gamepad2 className="h-6 w-6 text-primary" />
+          <img
+            src="/logo.png"
+            alt="Vault - Game Tracker"
+            className="h-8 w-8 object-contain"
+          />
           <span className="hidden sm:inline">Vault - Game Tracker</span>
         </Link>
 
