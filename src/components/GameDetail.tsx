@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { GameMediaGallery } from '@/components/GameMediaGallery'
+import { DuracionJuego } from '@/components/DuracionJuego'
 
 /** Placeholder animado mientras se carga el detalle desde IGDB. */
 function EsqueletoDetalle() {
@@ -228,6 +229,12 @@ export default function GameDetail() {
             <section className="space-y-3">
               <h2 className="font-medium">Galería</h2>
               <GameMediaGallery idVideo={detalle.idVideo} capturas={detalle.capturas} />
+            </section>
+
+            {/* Duración estimada (IGDB game_time_to_beats) */}
+            <section className="space-y-3">
+              <h2 className="font-medium">Duración estimada</h2>
+              <DuracionJuego idJuego={detalle.id} />
             </section>
           </div>
         </div>

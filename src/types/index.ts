@@ -140,3 +140,16 @@ export interface DetalleJuegoCompleto {
   /** id de YouTube del primer video encontrado, o null si no hay. */
   idVideo: string | null
 }
+
+/**
+ * Duración estimada de un juego según IGDB (endpoint `game_time_to_beats`),
+ * convertida a horas. `null` en un campo significa que IGDB no tiene ese dato.
+ */
+export interface DuracionJuego {
+  /** Yendo directo a la historia principal. */
+  apurado: number | null
+  /** A ritmo normal. */
+  normal: number | null
+  /** Completando el juego al 100%. */
+  completo: number | null
+}

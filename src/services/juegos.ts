@@ -1,9 +1,13 @@
 import type { CacheTop100, DetalleJuegoCompleto, ResultadoBusquedaJuego } from '@/types'
 import { igdbFetch } from './igdbClient'
 import { mapearJuegoIGDB, mapearDetalleJuegoIGDB } from './igdbMappers'
+import type { DuracionJuego } from '@/types'
 
 const CLAVE_CACHE_TOP_100 = 'game-tracker-top100-cache'
 const DURACION_CACHE_MS = 24 * 60 * 60 * 1000 // 24 horas
+
+const CLAVE_CACHE_DURACION = 'game-tracker-duracion-cache'
+const DURACION_CACHE_DURACION_MS = 30 * 24 * 60 * 60 * 1000
 
 /** Campos base que se piden a IGDB para cualquier juego (búsqueda, top 100, detalle). */
 const CAMPOS_JUEGO = 'id,name,cover.image_id,first_release_date,genres.name'
@@ -124,4 +128,69 @@ export async function obtenerDetalleCompletoJuego(id: number): Promise<DetalleJu
     throw new Error(`No se encontró información en IGDB para el juego con id ${id}.`)
   }
   return mapearDetalleJuegoIGDB(crudo)
+}
+
+interface EntradaCacheDuracion {
+  duracion: DuracionJuego | null // null = ya se consultó y IGDB no tiene el dato
+  timestamp: number
+}
+
+function leerCacheDuracion(): Record<number, EntradaCacheDuracion> {
+  try {
+    const crudo = localStorage.getItem(CLAVE_CACHE_DURACION)
+    return crudo ? JSON.parse(crudo) : {}
+  } catch {
+    return {}
+  }
+}
+
+function guardarEnCacheDuracion(id: number, duracion: DuracionJuego | null): void {
+  const cache = leerCacheDuracion()
+  cache[id] = { duracion, timestamp: Date.now() }
+  try {
+    localStorage.setItem(CLAVE_CACHE_DURACION, JSON.stringify(cache))
+  } catch {
+    // Cuota llena o modo privado: no se cachea, se vuelve a pedir la próxima vez.
+  }
+}
+
+/** Convierte segundos (formato IGDB) a horas, o null si el campo no vino. */
+function segundosAHoras(segundos: number | undefined): number | null {
+  if (!segundos || segundos <= 0) return null
+  return Math.round((segundos / 3600) * 10) / 10 // redondeado a 1 decimal
+}
+
+/**
+ * Busca la duración estimada de un juego (`game_time_to_beats` de IGDB) por
+ * su id. Cachea el resultado —incluso los "sin datos"— 30 días en
+ * localStorage para no repetir la consulta en cada render de una tarjeta.
+ */
+export async function obtenerDuracionJuego(id: number): Promise<DuracionJuego | null> {
+  const cache = leerCacheDuracion()
+  const entrada = cache[id]
+  if (entrada && Date.now() - entrada.timestamp < DURACION_CACHE_DURACION_MS) {
+    return entrada.duracion
+  }
+
+  const query = `
+    fields hastily,normally,completely;
+    where game_id = ${id};
+  `
+
+  const crudos = await igdbFetch('/game_time_to_beats', query)
+  const [crudo] = crudos as Array<{ hastily?: number; normally?: number; completely?: number }>
+
+  const duracion: DuracionJuego | null = crudo
+    ? {
+        apurado: segundosAHoras(crudo.hastily),
+        normal: segundosAHoras(crudo.normally),
+        completo: segundosAHoras(crudo.completely),
+      }
+    : null
+
+  const sinDatos = duracion && duracion.apurado === null && duracion.normal === null && duracion.completo === null
+  const resultado = sinDatos ? null : duracion
+
+  guardarEnCacheDuracion(id, resultado)
+  return resultado
 }
