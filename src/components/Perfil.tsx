@@ -4,7 +4,6 @@ import { Camera, X, Star, UserCircle, Trophy, ChevronLeft, ChevronRight } from '
 import { useLibraryStore, useProfileStore } from '@/store'
 import { abrirEdicionJuego } from '@/store/useGameEditDialogStore'
 import { convertirArchivoABase64 } from '@/lib/imagen'
-import { ThemeColorPicker } from '@/components/ThemeColorPicker'
 import { FavoriteManagerDialog } from '@/components/FavoriteManagerDialog'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -240,12 +239,6 @@ export default function Perfil() {
             )}
           </>
         )}
-      </section>
-
-      {/* Color primario */}
-      <section className="space-y-3">
-        <h2 className="text-lg font-medium">Color de la aplicación</h2>
-        <ThemeColorPicker />
       </section>
 
       <FavoriteManagerDialog

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Search, User, House, ListChecks, Trophy, UserCircle } from 'lucide-react'
+import { Search, User, House, ListChecks, Trophy, UserCircle, Settings } from 'lucide-react'
 import { toast } from 'sonner'
 import { useLibraryStore, useProfileStore } from '@/store'
 import { abrirEdicionJuego } from '@/store/useGameEditDialogStore'
@@ -21,6 +21,7 @@ const ENLACES_PERFIL = [
   { to: '/', etiqueta: 'Home', icono: House, fin: true },
   { to: '/perfil', etiqueta: 'Perfil', icono: UserCircle, fin: false },
   { to: '/backlog', etiqueta: 'Backlog', icono: ListChecks, fin: false },
+  { to: '/configuracion', etiqueta: 'Configuración', icono: Settings, fin: false },
 ] as const
 
 /**

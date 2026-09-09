@@ -30,7 +30,7 @@ export default function Home() {
           .
         </p>
       ) : (
-        <div className="mt-6 space-y-4">
+        <div className="relative mt-6 space-y-6 before:absolute before:bottom-0 before:left-[94px] before:top-0 before:w-px before:bg-border">
           {entradas.map((juego) => (
             <TimelineEntry key={juego.id} juego={juego} />
           ))}

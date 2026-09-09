@@ -93,10 +93,19 @@ export async function obtenerTop100(opciones?: {
     }
   }
 
+  /*
   const query = `
     fields ${CAMPOS_JUEGO},total_rating_count;
     where total_rating_count != null & cover != null;
     sort total_rating_count desc;
+    limit 100;
+  `
+  */
+
+  const query = `
+    fields ${CAMPOS_JUEGO},total_rating,total_rating_count;
+    where total_rating != null & total_rating_count > 100 & cover != null;
+    sort total_rating desc;
     limit 100;
   `
 

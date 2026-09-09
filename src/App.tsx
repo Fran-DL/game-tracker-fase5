@@ -8,6 +8,7 @@ import Top100 from '@/components/Top100'
 import Perfil from '@/components/Perfil'
 import Dev from '@/components/Dev'
 import GameDetail from '@/components/GameDetail'
+import Configuracion from '@/components/Configuracion'
 
 /**
  * Layout raíz: Navbar fija (Fase 6, reemplaza la nav temporal de la Fase 5),
@@ -27,6 +28,7 @@ function App() {
         <Route path="/backlog" element={<Backlog />} />
         <Route path="/top100" element={<Top100 />} />
         <Route path="/perfil" element={<Perfil />} />
+        <Route path="/configuracion" element={<Configuracion />} />
         <Route path="/dev" element={<Dev />} />
         <Route path="/juego/:id" element={<GameDetail />} />
       </Routes>
